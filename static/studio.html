@@ -1,0 +1,152 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AGENTHOOD / POP STUDIO</title><style>
+:root{background:#080b12;color:#eff3f8;font:14px system-ui,-apple-system,sans-serif}*{box-sizing:border-box}body{margin:0}a{color:#c4ff54}header{padding:20px 5%;border-bottom:1px solid #29303d;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;font-size:24px;letter-spacing:-1px}.accent{color:#c4ff54}.wrap{max-width:1250px;margin:auto;padding:35px 22px}.lead{font-size:clamp(35px,6vw,68px);letter-spacing:-3px;margin:8px 0;line-height:1.06}.muted{color:#aab2bf}.tag{font-size:11px;color:#c4ff54;border:1px solid #50633a;padding:6px 10px;border-radius:30px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.panel{background:#121720;border:1px solid #2a3340;border-radius:14px;padding:22px;margin-bottom:20px}h2{margin-top:0;font-size:19px}button{border:0;background:#c4ff54;color:#0c1206;padding:12px 16px;border-radius:8px;font-weight:800;cursor:pointer}button:disabled{opacity:.35;cursor:not-allowed}button.secondary{background:#303b48;color:#f4f7fb}input,textarea,select{width:100%;padding:12px;background:#090d15;color:white;border:1px solid #3a4555;border-radius:8px;margin:6px 0 14px;font:inherit}textarea{height:105px;resize:vertical}label{color:#b2bbca;font-size:12px}.row{display:flex;align-items:center;justify-content:space-between;gap:14px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:#243126;color:#c4ff54;padding:5px 9px;border-radius:6px;font-size:11px}.tile{border:1px solid #333f4c;border-radius:9px;padding:12px;margin:8px 0}.price{color:#c4ff54;font-weight:bold}.steps{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.step{border:1px solid #344052;padding:12px 7px;text-align:center;border-radius:8px;font-size:11px;text-transform:capitalize}.step.done{background:#203625;border-color:#7db83b}.step.active{border-color:#c4ff54;color:#c4ff54}.hidden{display:none}pre{background:#090c12;border:1px solid #303945;padding:13px;border-radius:8px;white-space:pre-wrap;overflow:auto;max-height:320px;font-size:12px}audio{width:100%;margin:12px 0}#notification{position:fixed;bottom:22px;right:22px;background:#233529;color:#fff;border:1px solid #c4ff54;padding:15px;border-radius:9px;display:none;z-index:9}.file{display:inline-flex;margin:5px;padding:8px 10px;border:1px solid #556346;border-radius:6px;text-decoration:none;font-size:12px}.events{max-height:400px;overflow:auto}.event{border-bottom:1px solid #313946;padding:9px 0;font-size:12px}.byline{font-size:11px;color:#adb6c3}footer{padding:25px;text-align:center;color:#8592a2;border-top:1px solid #29313d}@media(max-width:850px){.grid{grid-template-columns:1fr}.steps{grid-template-columns:repeat(4,1fr)}}
+
+.audio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:12px 0}
+.audio-grid audio{width:100%;height:36px;margin:8px 0}
+.artifact-text{white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto}
+.revision-links{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+</style></head><body><header><span class="logo">AGENT<span class="accent">HOOD</span> <span class="muted" style="font-size:13px">/ MUSIC STUDIO</span></span><a href="/">← Agent Exchange</a></header><main class="wrap"><div class="row" style="flex-wrap:wrap"><div><span class="tag">MARKETPLACE DEMO</span><h1 class="lead">The studio hires<br><span class="accent">a whole band.</span></h1><p class="muted">Original composition · market-priced talent · live approvals · public ratings · optional Cognee review sync</p></div><div class="panel" style="max-width:350px"><strong>Hear the song take shape</strong><p class="muted">Review the melody, arrangement, stems, lyric vocal and mix as specialists deliver them. Lyrics and marketing use a configured text model or offline templates. Audio is synthesized locally.</p></div></div><div class="grid"><section><div class="panel"><h2>New studio commission</h2><label>Customer / studio name</label><input id="customer" value="Localhost Pop Studio"><label>Track title</label><input id="title" value="Afterglow"><label>Creative brief</label><textarea id="brief">Make an original upbeat 2010s-inspired synth-pop song with a soaring chorus, punchy drums, optimistic lyrics and a big final hook.</textarea><button type="button" class="secondary" onclick="referenceBrief()">Use a Rihanna 2010s example brief</button><label>Studio hiring budget (internal $-quoted capacity)</label><input id="budget" type="number" min="1" max="100" step=".50" value="5"><label for="provider">Lyrics and marketing provider</label><select id="provider"><option value="auto">Auto · use a configured model</option><option value="demo">Offline templates</option><option value="darkbloom">Darkbloom / compatible API</option><option value="ollama">Ollama</option></select><label><input type="checkbox" id="processing" style="width:auto"> Allow the selected model to process this project’s brief, feedback and relevant private studio notes</label><button onclick="create()">Create studio project →</button><p class="byline">This creates an unpaid studio request; internal market charges are not real customer revenue.</p></div><div class="panel"><div class="row"><h2>Music agent exchange</h2><span class="chip" id="count">Loading</span></div><p class="muted">Four independently quoted specialists per music role, hired one per stage using market price and public reviews.</p><div id="catalog"></div></div></section><section><div class="panel"><div class="row"><h2>Studio control room</h2><button class="secondary" onclick="loadCurrent()">Refresh</button></div><label>Existing projects</label><select id="projectSelect" onchange="pick(this.value)"><option value="">Select project</option></select><div id="controls"><p class="muted">Create or select a project to begin.</p></div></div><div class="panel"><h2>Hires, budget and progress</h2><div id="steps"></div><div id="progress" class="muted" aria-live="polite">No project selected.</div></div><div class="panel"><h2>Listen and download</h2><div id="files" class="muted">Your original song assets will appear here.</div></div><div class="panel"><h2>Public rating & private notes</h2><div id="rating"><p class="muted">After delivery, rate each hired specialist. Ratings affect future agent selection and can sync to Cognee if enabled.</p></div></div><div class="panel"><h2>Audit trail</h2><div id="events" class="events"></div></div></section></div></main><footer>AGENTHOOD MUSIC STUDIO · Synthesized demo audio · Internal capacity credits</footer><div id="notification"></div><script>
+const roles=['lyricist','composer','arranger','instrumentalist','singer','producer','marketing'];let current=null, cache=null, polling=false;
+const busy=new Set();
+const audioNames={
+  'melody.wav':'Melody', 'composition.wav':'Melody and chords', 'arrangement.wav':'Arranged song',
+  'drums.wav':'Drums stem', 'bass.wav':'Bass stem', 'keys.wav':'Synth keys stem',
+  'instrumental.wav':'Instrumental backing', 'lyric_vocal.wav':'Lyric vocal · synthesized', 'model_take.wav':'Sung take · ACE-Step',
+  'conditioning_sketch.wav':'Conditioning sketch',
+  'vocal_guide.wav':'Wordless melody guide · algorithmic fallback',
+  'pre_mix.wav':'Pre-mix', 'final_mix.wav':'Final mix'
+};
+const revisionHints={
+  lyricist:'With a text model, describe the rewrite. Offline themes include summer, city and heartbreak.',
+  composer:'Try “higher”, “slower”, “minor” or a tempo such as “112 BPM”.',
+  arranger:'Try “shorter”, “extended” or “sparse”.',
+  instrumentalist:'Try “heavier” or “sparse”.',
+  singer:'Try “higher”, “lower” or “smoother”.',
+  producer:'Try “louder vocal”, “quieter vocal”, “more bass” or “wider”.'
+};
+const urlFor=(pid, file, delivery)=>'/api/music/projects/'+pid+
+  (delivery?'/deliveries/'+delivery:'/files')+'/'+encodeURIComponent(file);
+const $=id=>document.getElementById(id);function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}function notify(s){$('notification').textContent=s;$('notification').style.display='block';setTimeout(()=>$('notification').style.display='none',4000)}async function api(u,o){let r=await fetch(u,o);let d=await r.json();if(r.status===401)throw Error('Sign in as a buyer at Agent Exchange to use the studio');if(!r.ok)throw Error(typeof d.detail==='string'?d.detail:JSON.stringify(d.detail));return d}const post=(u,d)=>api(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+async function catalog(){let a=await api('/api/music/catalog');$('count').textContent=a.length+' agents';$('catalog').innerHTML=roles.map(role=>{let xs=a.filter(x=>x.skill===role);return `<details><summary style="cursor:pointer;padding:10px;border-bottom:1px solid #344052;text-transform:capitalize">${role} <span class="muted" style="float:right">${xs.filter(x=>x.available_capacity>0).length} available</span></summary>${xs.map(x=>`<div class="tile row"><div><strong>${esc(x.name)}</strong> <span class="muted">${esc(x.ticker)}</span><div class="byline">${x.available_capacity}/${x.total_capacity} units · ${x.rating_count} reviews · ${x.rating_average??'Unrated'}/5</div></div><div class="price">$${x.quote.toFixed(3)}</div></div>`).join('')}</details>`}).join('')}
+async function list(){let xs=await api('/api/music/projects');$('projectSelect').innerHTML='<option value="">Select project</option>'+xs.map(x=>`<option value="${x.id}" ${current===x.id?'selected':''}>${esc(x.song_name)} · ${esc(x.status)} · ${x.id}</option>`).join('')}
+async function create(){try{let d=await post('/api/music/projects',{customer:$('customer').value,song_name:$('title').value,brief:$('brief').value,budget:Number($('budget').value),provider:$('provider').value,allow_processing:$('processing').checked});current=d.project.id;notify('Studio project created.');await list();render(d)}catch(e){notify(e.message)}}
+function referenceBrief(){
+  $('brief').value='Write an original 2010s pop song about choosing yourself after a breakup. Use Rihanna’s Loud and Talk That Talk as references for bright dance-pop synths and a big chorus, with the sparse verse, syncopated bass and upfront vocal of ANTI. Write new lyrics and melody, then perform the words in the final mix.';
+}
+function pick(id){
+  current=id||null;
+  cache=null;
+  if(current)loadCurrent();
+  else location.reload();
+}
+
+async function loadCurrent(){
+  if(!current)return;
+  try{
+    const pid=current;
+    const data=await api('/api/music/projects/'+pid);
+    render(data);
+    if(current===pid)await Promise.all([catalog(),list()]);
+  }catch(e){notify(e.message)}
+}
+
+function renderFiles(d, previous){
+  if(previous?.project.id===d.project.id &&
+     JSON.stringify(previous.artifacts)===JSON.stringify(d.artifacts))return;
+  // Polling can update progress without interrupting playback.
+  const pid=d.project.id;
+  const links=Object.keys(audioNames).filter(name=>d.files.includes(name)).map(name=>{
+    const url=urlFor(pid,name,d.artifacts[name]);
+    return `<div class="tile"><strong>${audioNames[name]}</strong><audio controls preload="none" src="${url}"></audio><a href="${url}" download="${name}">Download WAV ↓</a></div>`;
+  });
+  const docs=d.files.filter(name=>!name.endsWith('.wav')).map(name=>{
+    const url=urlFor(pid,name,d.artifacts[name]);
+    if(/\.(txt|md)$/.test(name)){
+      return `<details ontoggle="previewText(this)" data-url="${url}"><summary>${esc(name)}</summary><pre class="artifact-text">Loading…</pre><a href="${url}" download="${esc(name)}">Download ↓</a></details>`;
+    }
+    return `<a class="file" href="${url}" download="${esc(name)}">${esc(name)} ↓</a>`;
+  });
+  $('files').innerHTML=(links.length?'<div class="audio-grid">'+links.join('')+'</div>':'')+docs.join('')+
+    (d.files.length?`<p><a class="file" href="${urlFor(pid,'bundle.zip')}">Download latest studio bundle ZIP ↓</a></p>`:'No files yet');
+}
+
+async function previewText(details){
+  if(!details.open || details.dataset.loaded)return;
+  try{
+    const response=await fetch(details.dataset.url);
+    if(!response.ok)throw Error('Could not open this draft.');
+    details.querySelector('pre').textContent=await response.text();
+    details.dataset.loaded='true';
+  }catch(e){details.querySelector('pre').textContent=e.message}
+}
+
+function render(d){
+  const p=d.project;
+  if(current!==p.id || (cache?.project.id===p.id && cache.project.updated_at>p.updated_at))return;
+  const previous=cache;
+  cache=d;
+  const stage=p.stage;
+  const pending=p.status==='awaiting_approval';
+  const running=p.status==='running';
+  const active=d.hires.find(h=>h.status==='working');
+  $('steps').innerHTML='<div class="steps">'+roles.map((role,i)=>
+    `<div class="step ${role===active?.role?'active':i<stage?'done':i===stage?'active':''}">${i<stage&&role!==active?.role?'✓ ':''}${role}</div>`
+  ).join('')+'</div>';
+  const feedback=$('approvalFeedback')?.value||'';
+  const currentRole=roles[stage-1];
+  const canAddVocal=stage>=5 && !running && !d.files.includes('model_take.wav') &&
+    (d.song_model || !d.files.includes('lyric_vocal.wav'));
+  const showSongConsent=d.song_hosted && !running && (canAddVocal || stage===4 || (stage===5 && pending));
+  const consent=showSongConsent?'<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="songConsent" style="width:auto;margin:0"> Allow sending this project’s brief, lyrics, feedback and backing audio to the Tinfoil renderer for this take</label>':'';
+  const vocalAction=canAddVocal?'<p><button onclick="change(&quot;lyric-vocals&quot;,{})">'+(d.song_model?'Generate sung take':'Add lyric vocals')+
+    (stage>=6?' and update mix':'')+'</button></p>':'';
+  const action=running?`<p class="accent" role="status">${esc(active?.name||'Specialist')} is working on ${esc(active?.role||'this stage')}…</p>`:
+    pending?`<p class="accent"><strong>Review the ${currentRole} delivery.</strong></p>
+      <label for="approvalFeedback">${revisionHints[currentRole]}</label>
+      <textarea id="approvalFeedback" maxlength="600" placeholder="What should this specialist change?">${esc(feedback)}</textarea>
+      <button onclick="approval(true)">Approve delivery</button>
+      <button class="secondary" onclick="approval(false)">Request revision</button>`:
+    p.status==='complete'?'<span class="chip">Production complete ✓</span>':
+    `<button onclick="advance()" id="advance">${p.status==='retryable'?'Retry ': 'Hire '}${roles[stage]} →</button>`;
+  $('controls').innerHTML=`<div class="row"><div><strong>${esc(p.song_name)}</strong><div class="byline">${esc(p.id)} · ${esc(p.status)}</div></div><span class="chip">${stage}/7 delivered</span></div><p class="muted">${esc(p.brief)}</p>${consent}${vocalAction}${action}`;
+  $('progress').innerHTML=`<p><strong>Budget</strong> $${Number(p.budget).toFixed(2)} · <strong>Capacity spent</strong> $${Number(p.spent).toFixed(3)} · <strong>Remaining</strong> $${(p.budget-p.spent).toFixed(3)}</p>`+
+    d.hires.map(h=>`<div class="tile row"><div><strong>${esc(h.name)}</strong> · ${esc(h.role)}
+      <div class="byline">${esc(h.output)}</div>${h.mode?`<div class="byline">${esc(h.mode)}</div>`:''}
+      ${h.files.some(f=>d.artifacts[f]!==h.id)?'<div class="revision-links">'+h.files.map(f=>
+        `<a href="${urlFor(p.id,f,h.id)}" target="_blank" rel="noopener">${esc(f)}</a>`).join('')+'</div>':''}
+      </div><div><span class="chip">${esc(h.status)}</span><div class="price">${h.price===0?'Revision':'$'+h.price.toFixed(3)}</div></div></div>`).join('');
+  renderFiles(d,previous);
+  $('events').innerHTML=d.events.slice().reverse().map(e=>`<div class="event"><b>${esc(e.event)}</b><div class="byline">${esc(JSON.stringify(e.detail))}</div></div>`).join('');
+  const specialists=[...new Map(d.hires.filter(h=>h.status==='completed').map(h=>[h.agent_id,h])).values()];
+  $('rating').innerHTML=p.status==='complete'?`<p class="muted">One public rating per specialist. Your comment stays private. The audit trail shows optional Cognee rating sync.</p><select id="ratingAgent">${specialists.map(h=>`<option value="${h.agent_id}">${esc(h.name)} — ${esc(h.role)}</option>`).join('')}</select><select id="stars"><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Average</option><option value="2">2 — Below expectations</option><option value="1">1 — Poor</option></select><textarea id="reviewText" placeholder="What did this specialist do well or poorly?"></textarea><button onclick="review()">Publish rating and save private note</button>`:'<p class="muted">Complete production to publish an agent rating.</p>';
+}
+
+async function change(action, body){
+  const pid=current;
+  if(!pid||busy.has(pid))return;
+  busy.add(pid);
+  $('controls').querySelectorAll('button').forEach(button=>button.disabled=true);
+  try{
+    render(await post('/api/music/projects/'+pid+'/'+action,{...body,allow_hosted_song:!!$('songConsent')?.checked}));
+    await Promise.all([catalog(),list()]);
+  }catch(e){
+    notify(e.message);
+    if(current===pid)await loadCurrent();
+  }finally{busy.delete(pid)}
+}
+function advance(){return change('advance',{})}
+function approval(ok){return change('approve',{approved:ok,feedback:$('approvalFeedback').value})}
+async function review(){try{const x=await post('/api/music/projects/'+current+'/review',{agent_id:$('ratingAgent').value,rating:Number($('stars').value),comment:$('reviewText').value});notify('Published rating · Cognee: '+x.cognee);render(x.project);await catalog()}catch(e){notify(e.message)}}
+
+setInterval(async ()=>{
+  const pid=current;
+  if(!pid || polling || (!busy.has(pid) && cache?.project.status!=='running'))return;
+  polling=true;
+  try{
+    const data=await api('/api/music/projects/'+pid);
+    if(data.project.updated_at!==cache?.project.updated_at)render(data);
+  }catch(e){/* The active action or manual refresh reports connection errors. */}
+  finally{polling=false}
+},650);
+Promise.all([catalog(),list()]).catch(e=>notify(e.message));
+</script></body></html>

@@ -1,0 +1,29 @@
+# Set the CVM version and immutable image digest before cutting a measured release.
+cvm-version: "<CVM_VERSION>"
+cpus: 8
+memory: 16384
+gpus: 1
+
+containers:
+  - name: "ace-step"
+    image: "ghcr.io/<owner>/agenthood-ace-step@sha256:<digest>"
+    runtime: nvidia
+    gpus: all
+    restart: always
+    secrets:
+      - SONG_RENDER_TOKEN
+    tmpfs:
+      /tmp: size=256m,mode=1777
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 2m
+      retries: 8
+
+shim:
+  upstream-port: 8080
+  paths:
+    - /health
+    - /synth
+    - /job

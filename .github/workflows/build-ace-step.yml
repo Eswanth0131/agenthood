@@ -1,0 +1,27 @@
+# Copy to .github/workflows/build-ace-step.yml in the public Tinfoil config repo.
+# Copy deploy/tinfoil into the repo first. Run this workflow manually to publish.
+name: Build ACE-Step GPU image
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and publish Linux GPU image
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_ACTOR: ${{ github.actor }}
+          OWNER: ${{ github.repository_owner }}
+          REVISION: ${{ github.sha }}
+        run: |
+          set -eu
+          image="ghcr.io/${OWNER,,}/agenthood-ace-step"
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+          docker buildx build --platform linux/amd64 --tag "$image:$REVISION" \
+            --metadata-file "$RUNNER_TEMP/image.json" --push deploy/tinfoil
+          digest="$(jq -er '."containerimage.digest"' "$RUNNER_TEMP/image.json")"
+          printf 'Image for tinfoil-config.yml: `%s@%s`\n' "$image" "$digest" >> "$GITHUB_STEP_SUMMARY"

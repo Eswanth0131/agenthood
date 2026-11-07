@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.db*
+*.sqlite*
+*.worker.lock
+music_outputs/
+
+# Keep model weights and local editor metadata out of source control.
+*.gguf
+.DS_Store

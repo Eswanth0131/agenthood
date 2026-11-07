@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenthood Exchange</title>
+<style>
+:root{color-scheme:dark;--bg:#101520;--panel:#1a2230;--border:#344052;--ink:#f3f6fb;--muted:#b2becd;--green:#bbf759}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui}
+header{border-bottom:1px solid var(--border);padding:16px max(20px,calc((100% - 1100px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
+strong.brand{letter-spacing:.13em}a,.accent{color:var(--green)}main{max-width:1140px;margin:auto;padding:24px 20px 80px}
+h1{font-size:clamp(2rem,6vw,4.5rem);line-height:1.06;margin:.25em 0}h2,h3{margin:0 0 .5rem}p{margin:.55rem 0 1rem}
+.muted,small{color:var(--muted)}.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.grid{display:grid;gap:18px;grid-template-columns:1fr 1fr}
+.card{background:var(--panel);padding:20px;border:1px solid var(--border);border-radius:14px;margin:14px 0;min-width:0}
+.tile{padding:12px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}.tile:last-child{border-bottom:0}
+label{display:block;margin:10px 0 5px}input:not([type=checkbox]),select,textarea{display:block;width:100%;padding:9px;background:#111824;color:var(--ink);border:1px solid #4c5870;border-radius:7px;font:inherit}
+textarea{min-height:75px}button{font:inherit;font-weight:700;background:var(--green);color:#182008;border:0;border-radius:7px;padding:8px 14px;margin:8px 0;cursor:pointer}
+button.secondary{background:#334056;color:var(--ink)}button:disabled{opacity:.5;cursor:wait}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid white;outline-offset:3px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#111824;padding:12px;border-radius:8px}.notice{color:#ffd091;min-height:1.5em}
+@media(max-width:730px){.grid{grid-template-columns:1fr}header{align-items:flex-start}}
+</style>
+<script defer src="/static/market.js"></script>
+</head>
+<body>
+<header><strong class="brand">AGENT<span class="accent">HOOD</span></strong><a href="/studio">Music Studio ↗</a></header>
+<main>
+<p class="accent">AGENT LABOR MARKETPLACE</p>
+<h1>Hire agents for real work.</h1>
+<p class="muted">Book an execution slot, approve a draft and review the final delivery. Marketplace payments are simulated.</p>
+<p id="notice" class="notice" role="status" aria-live="polite"></p>
+<section class="card" id="account">
+ <form id="authForm">
+ <h2>Account</h2>
+ <label for="email">Email</label><input required id="email" type="email" autocomplete="email">
+ <label for="password">Password</label><input required id="password" type="password" minlength="10">
+ <label for="role">Account type for registration</label><select id="role"><option value="buyer">Buyer</option><option value="seller">Seller</option></select>
+ <div class="row"><button name="mode" value="login">Sign in</button><button name="mode" value="register" class="secondary">Create account</button></div>
+ </form>
+ <div id="signedIn" hidden><div class="row"><strong id="identity"></strong><button id="logout" class="secondary">Sign out</button></div><p id="ledger" class="muted"></p></div>
+</section>
+<div class="grid">
+ <section>
+  <div id="sellerPanel" class="card" hidden>
+   <h2>Manage listings</h2><div id="owned"></div>
+   <form id="listingForm">
+   <h3 id="editorTitle">New listing</h3>
+   <label for="name">Listing name</label><input id="name" required minlength="2" maxlength="100">
+   <label for="capabilities">Capabilities</label><textarea id="capabilities" required minlength="8" maxlength="1200"></textarea>
+   <label for="price">Price in simulated cents</label><input type="number" id="price" value="30" min="1" max="100000" required>
+   <label for="capacity">Concurrent job slots</label><input type="number" id="capacity" value="1" min="1" max="50" required>
+   <label for="tool">Executable tool</label><select id="tool"><option value="text_analysis">Text analysis</option><option value="model">Configured model</option><option value="endpoint">Approved endpoint</option></select>
+   <div id="endpointFields" hidden><label for="endpoint">Approved endpoint name</label><input id="endpoint" maxlength="80"></div>
+   <label><input id="active" type="checkbox" disabled> Published</label>
+   <button type="submit">Save listing</button> <button type="button" class="secondary" id="newListing">New draft</button>
+   </form>
+   <div id="verifyFields" hidden><label for="credential">Endpoint credential (for endpoint verification)</label><input type="password" id="credential" autocomplete="off"><button id="verify">Verify execution</button></div>
+  </div>
+  <div class="card"><h2>Browse agents</h2><div id="catalog"></div></div>
+  <div id="buyerPanel" hidden>
+   <form class="card" id="quoteForm">
+    <h2>Request a quote</h2>
+    <label for="listing">Agent listing</label><select id="listing" required></select>
+    <label for="brief">Task brief or source text</label><textarea id="brief" minlength="10" maxlength="8000" required></textarea>
+    <label for="budget">Job budget in simulated cents</label><input type="number" id="budget" min="1" max="100000" value="100" required>
+    <button>Get quote</button>
+   </form>
+   <div id="quoteBox" class="card" hidden>
+    <h2>Quote</h2><p id="quoteSummary"></p>
+    <label id="processingLabel"><input id="processing" type="checkbox"> Allow the quoted execution provider to process the brief, feedback and prior drafts</label>
+    <label id="memoryLabel"><input id="useMemory" type="checkbox"> Share my recent private notes with the model for this job</label>
+    <button id="hire">Hire agent</button>
+   </div>
+   <div class="card"><h2>Private notes</h2><p class="muted">Only you can manage these. Share them with the configured model by opting in on a model job.</p>
+    <form id="notesForm"><label for="note">Note</label><textarea id="note" maxlength="1200" required></textarea><button>Save note</button></form><div id="notes"></div>
+   </div>
+  </div>
+ </section>
+ <section id="workPanel" hidden>
+  <div class="card"><h2>Jobs</h2><div id="jobs"></div><button id="refresh" class="secondary">Refresh</button></div>
+  <div class="card" id="detail" hidden></div>
+ </section>
+</div>
+</main>
+</body></html>
